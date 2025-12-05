@@ -17,8 +17,7 @@ import {
   Send
 } from 'lucide-react';
 
-// --- MOCK DATA & BACKEND SIMULATION ---
-// In a real app, this would be your Firebase/Database content
+// --- MOCK DATA ---
 const MOCK_DATA = {
   districts: [
     "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha", 
@@ -68,21 +67,18 @@ const Badge = ({ children, type = "default" }) => {
   );
 };
 
-// --- MAIN APP COMPONENT ---
+// --- MAIN APP ---
 
 export default function AKEFPortal() {
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState("feed");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Data State (Simulating Database)
+  // Data State
   const [posts, setPosts] = useState(MOCK_DATA.posts);
   const [tasks, setTasks] = useState(MOCK_DATA.tasks);
   const [messages, setMessages] = useState(MOCK_DATA.chat);
-  const [newTaskModal, setNewTaskModal] = useState(false);
 
-  // -- Actions --
-  
   const handleLogin = (user) => {
     setCurrentUser(user);
     setActiveTab("feed");
@@ -94,7 +90,6 @@ export default function AKEFPortal() {
 
   const addTask = (task) => {
     setTasks([task, ...tasks]);
-    setNewTaskModal(false);
   };
 
   const sendMessage = (text) => {
@@ -107,8 +102,6 @@ export default function AKEFPortal() {
     };
     setMessages([...messages, newMsg]);
   };
-
-  // -- Views --
 
   if (!currentUser) {
     return <LoginScreen onLogin={handleLogin} />;
@@ -205,17 +198,15 @@ function FeedView({ user, posts, setPosts }) {
     setNewPost("");
   };
 
-  // Filter posts based on visibility
   const visiblePosts = posts.filter(post => {
-    if (user.role === "STATE_ADMIN") return true; // State sees all
-    if (!post.district) return true; // Global posts seen by all
-    return post.district === user.district; // District specific
+    if (user.role === "STATE_ADMIN") return true;
+    if (!post.district) return true;
+    return post.district === user.district;
   });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
-        {/* Create Post Widget */}
         {(user.role === "STATE_ADMIN" || user.role === "DISTRICT_ADMIN") && (
           <Card className="bg-gradient-to-r from-gray-800 to-gray-800/50 border-green-900/30">
             <h3 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
@@ -223,7 +214,7 @@ function FeedView({ user, posts, setPosts }) {
             </h3>
             <form onSubmit={handlePost}>
               <textarea 
-                className="w-full bg-gray-900/50 border border-gray-700 rounded-md p-3 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all placeholder-gray-600"
+                className="w-full bg-gray-900/50 border border-gray-700 rounded-md p-3 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all placeholder-gray-600 text-white"
                 placeholder={`What's happening in ${user.role === "STATE_ADMIN" ? "Kerala" : user.district}?`}
                 rows="3"
                 value={newPost}
@@ -249,7 +240,6 @@ function FeedView({ user, posts, setPosts }) {
           </Card>
         )}
 
-        {/* Posts Feed */}
         <div className="space-y-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             Latest Updates <span className="text-xs font-normal text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">{visiblePosts.length}</span>
@@ -283,7 +273,6 @@ function FeedView({ user, posts, setPosts }) {
         </div>
       </div>
 
-      {/* Sidebar Info */}
       <div className="space-y-6">
         <Card className="bg-green-900/10 border-green-900/50">
           <h3 className="font-bold text-green-400 mb-2 flex items-center gap-2">
@@ -335,10 +324,8 @@ function TaskView({ user, tasks, onAddTask }) {
 
   const myTasks = tasks.filter(t => t.assignedTo === user.id);
   const assignedByMe = tasks.filter(t => t.assignedBy === user.id);
-
   const canAssignTask = user.role !== "EMPLOYEE";
   
-  // Filter potential assignees based on role
   const potentialAssignees = MOCK_DATA.users.filter(u => {
     if (u.id === user.id) return false;
     if (user.role === "STATE_ADMIN") return true;
@@ -376,7 +363,6 @@ function TaskView({ user, tasks, onAddTask }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* My Tasks */}
         <div className="space-y-3">
           <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider flex items-center gap-2">
             <User size={14} /> Assigned to Me
@@ -387,7 +373,6 @@ function TaskView({ user, tasks, onAddTask }) {
           ))}
         </div>
 
-        {/* Assigned By Me */}
         {canAssignTask && (
           <div className="space-y-3">
             <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider flex items-center gap-2">
@@ -401,7 +386,6 @@ function TaskView({ user, tasks, onAddTask }) {
         )}
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
            <div className="bg-gray-800 rounded-lg max-w-md w-full p-6 border border-gray-700">
@@ -432,7 +416,7 @@ function TaskView({ user, tasks, onAddTask }) {
                     </select>
                  </div>
                  <div className="flex gap-3 pt-2">
-                    <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">Cancel</button>
+                    <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm text-gray-200">Cancel</button>
                     <button type="submit" className="flex-1 bg-green-600 hover:bg-green-500 text-black font-bold py-2 rounded text-sm">Assign</button>
                  </div>
               </form>
@@ -463,11 +447,9 @@ function ChatView({ user, messages, onSendMessage }) {
   const [input, setInput] = useState("");
   const chatEndRef = React.useRef(null);
 
-  const scrollToBottom = () => {
+  useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(scrollToBottom, [messages]);
+  }, [messages]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -476,7 +458,6 @@ function ChatView({ user, messages, onSendMessage }) {
     setInput("");
   };
 
-  // Filter messages for current user's district
   const districtMessages = messages.filter(m => m.district === user.district);
 
   if (!user.district && user.role === "STATE_ADMIN") {
@@ -484,7 +465,7 @@ function ChatView({ user, messages, onSendMessage }) {
         <div className="flex flex-col items-center justify-center h-[60vh] text-center p-6">
            <MessageSquare size={48} className="text-gray-600 mb-4" />
            <h3 className="text-xl font-bold text-gray-300">Select a District Channel</h3>
-           <p className="text-gray-500 max-w-md mt-2">As a State Admin, you would typically select a specific district from a list to view their internal communications. (Demo restricted to district view)</p>
+           <p className="text-gray-500 max-w-md mt-2">As a State Admin, you would typically select a specific district from a list to view their internal communications.</p>
         </div>
      );
   }
@@ -492,7 +473,7 @@ function ChatView({ user, messages, onSendMessage }) {
   return (
     <div className="flex flex-col h-[calc(100vh-140px)] max-h-[600px] bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
       <div className="bg-gray-900/50 p-4 border-b border-gray-700 flex justify-between items-center">
-         <h3 className="font-bold flex items-center gap-2">
+         <h3 className="font-bold flex items-center gap-2 text-white">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             {user.district} District Chat
          </h3>
@@ -535,7 +516,7 @@ function ChatView({ user, messages, onSendMessage }) {
 function AdminView() {
   return (
     <div className="space-y-6">
-       <h2 className="text-2xl font-bold">Administration</h2>
+       <h2 className="text-2xl font-bold text-white">Administration</h2>
        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="flex flex-col items-center justify-center p-8 border-dashed border-2 border-gray-700 bg-transparent hover:border-green-500 cursor-pointer transition-colors group">
              <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mb-3 group-hover:bg-green-900/30">
@@ -552,7 +533,7 @@ function AdminView() {
        </div>
        
        <div className="mt-8">
-          <h3 className="text-lg font-bold mb-4">All Users Directory</h3>
+          <h3 className="text-lg font-bold mb-4 text-white">All Users Directory</h3>
           <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
              <table className="w-full text-sm text-left">
                 <thead className="bg-gray-900 text-gray-400 uppercase text-xs">
@@ -566,7 +547,7 @@ function AdminView() {
                 <tbody className="divide-y divide-gray-700">
                    {MOCK_DATA.users.map(u => (
                       <tr key={u.id} className="hover:bg-gray-700/50">
-                         <td className="px-6 py-4 font-medium">{u.name}</td>
+                         <td className="px-6 py-4 font-medium text-white">{u.name}</td>
                          <td className="px-6 py-4"><Badge>{u.role}</Badge></td>
                          <td className="px-6 py-4 text-gray-400">{u.district || "-"}</td>
                          <td className="px-6 py-4 text-gray-400">{u.email}</td>
@@ -580,12 +561,9 @@ function AdminView() {
   );
 }
 
-// --- LOGIN SCREEN ---
-
 function LoginScreen({ onLogin }) {
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
          <div className="absolute -top-20 -right-20 w-96 h-96 bg-green-600/10 rounded-full blur-3xl"></div>
          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-green-600 to-transparent opacity-50"></div>
@@ -658,7 +636,6 @@ function LoginScreen({ onLogin }) {
   );
 }
 
-// Utility Components
 const NavButton = ({ active, onClick, icon, children }) => (
   <button 
     onClick={onClick}
