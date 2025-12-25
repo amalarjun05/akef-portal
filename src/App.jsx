@@ -6,8 +6,6 @@ import {
   UploadCloud, Trash2, FileSpreadsheet, ArrowLeft, Download, Printer, ExternalLink,
   Receipt, DollarSign, XCircle, Vote, BarChart, Image as ImageIcon, Briefcase
 } from 'lucide-react';
-// Note: We use 'EmailGenerator' (the component name) from the file 'EmailCraft'
-import EmailGenerator from './components/EmailGenerator/EmailCraft';
 
 // --- MOCK DATA & LOCAL STORAGE HELPERS ---
 const loadFromStorage = (key, defaultData) => {
@@ -526,12 +524,17 @@ function LibraryView() {
       desc: "Open external invoicing tool", 
       icon: FileSpreadsheet, 
       color: "text-blue-400",
-      link: "https://akef-invoice.vercel.app" // REPLACE THIS WITH YOUR REAL LINK
+      link: "https://akef-invoice.vercel.app" 
+    },
+    { 
+      id: 'email_craft', 
+      name: "Email Craft", 
+      desc: "Professional email generator", 
+      icon: Mail, 
+      color: "text-purple-400",
+      link: "https://email-craft-bice.vercel.app/" 
     }
   ];
-  <Routes>
-  <Route path="/email-generator" element={<EmailGenerator />} />
-</Routes>
 
   const assets = [
     { id: 1, name: "AKEF Logo Pack", type: "ZIP", desc: "Official Logos (PNG, SVG, AI)" },
